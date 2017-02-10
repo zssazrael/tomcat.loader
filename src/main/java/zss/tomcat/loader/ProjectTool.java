@@ -18,7 +18,7 @@ import org.jdom.input.SAXBuilder;
 public class ProjectTool
 {
     private static final Log LOGGER = LogFactory.getLog(ProjectTool.class);
-    
+
     private final File folder;
 
     public File getFolder()
@@ -34,6 +34,7 @@ public class ProjectTool
     public void load(final Project project, final Document document) throws FileNotFoundException, IOException, JDOMException
     {
         final Element projectElement = document.getRootElement();
+        loadModule(project, projectElement);
         final Project root = project.getRoot();
 
         for (Object dependenciesElementObject : projectElement.getChildren("dependencies", projectElement.getNamespace()))
@@ -91,7 +92,10 @@ public class ProjectTool
                         dependency.addExclusion(new Project(dependency, exclusionGroupID, exclusionArtifactID));
                     }
                 }
-
+                if (dependency.getVersion() == null)
+                {
+                    dependency.setVersion(project.getModuleMap().get(dependency.getArtifactID()));
+                }
                 project.addDependency(dependency);
             }
         }
@@ -102,6 +106,43 @@ public class ProjectTool
             {
                 load(dependency);
             }
+        }
+    }
+
+    private void loadModule(Project project, Element projectElement) throws JDOMException, IOException
+    {
+        final Element parentElement = projectElement.getChild("parent", projectElement.getNamespace());
+        if (parentElement == null)
+        {
+            return;
+        }
+
+        final String parentGroupID = parentElement.getChildTextTrim("groupId", parentElement.getNamespace());
+        final String parentArtifactID = parentElement.getChildTextTrim("artifactId", parentElement.getNamespace());
+        final String parentVersion = parentElement.getChildTextTrim("version", parentElement.getNamespace());
+        if ((parentVersion == null) || (parentArtifactID == null) || (parentGroupID == null))
+        {
+            return;
+        }
+        final File parentGroupFolder = new File(folder, parentGroupID.replace('.', '/'));
+        final File parentArtifactFolder = new File(parentGroupFolder, parentArtifactID);
+        final File parentVersionFolder = new File(parentArtifactFolder, parentVersion);
+        final File pomFile = new File(parentVersionFolder, parentArtifactID.concat("-").concat(parentVersion).concat(".pom"));
+        if (!pomFile.isFile())
+        {
+            return;
+        }
+        LOGGER.info(pomFile.getAbsolutePath());
+        final Document parentDocument = new SAXBuilder(false).build(pomFile);
+        final Element modulesElement = parentDocument.getRootElement().getChild("modules", parentDocument.getRootElement().getNamespace());
+        if (modulesElement == null)
+        {
+            return;
+        }
+        for (Object moduleElementObject : modulesElement.getChildren("module", modulesElement.getNamespace()))
+        {
+            final Element moduleElement = (Element) moduleElementObject;
+            project.getModuleMap().put(moduleElement.getTextTrim(), parentVersion);
         }
     }
 

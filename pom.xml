@@ -4,7 +4,7 @@
 
   <groupId>zss</groupId>
   <artifactId>tomcat.loader</artifactId>
-  <version>2016.12.06</version>
+  <version>2017.02.10</version>
   <packaging>jar</packaging>
 
   <name>tomcat.loader</name>
@@ -18,8 +18,8 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>

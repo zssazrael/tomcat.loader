@@ -1,14 +1,13 @@
 package zss.tomcat.loader;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 public class Project
 {
     private final ProjectList dependencies = new ProjectList();
     private final ProjectList exclusions = new ProjectList();
-
-    public ProjectList getExclusions()
-    {
-        return exclusions;
-    }
+    private final Map<String, String> moduleMap = new TreeMap<>();
 
     private final String groupID;
     private final String artifactID;
@@ -16,6 +15,16 @@ public class Project
     private String version;
     private String scope;
     private String optional;
+
+    public Map<String, String> getModuleMap()
+    {
+        return moduleMap;
+    }
+
+    public ProjectList getExclusions()
+    {
+        return exclusions;
+    }
 
     public String getOptional()
     {
