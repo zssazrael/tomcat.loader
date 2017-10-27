@@ -3,7 +3,7 @@
 
     <groupId>zss</groupId>
     <artifactId>tomcat.loader</artifactId>
-    <version>2017.07.22</version>
+    <version>2017.10.24</version>
     <packaging>jar</packaging>
 
     <name>tomcat.loader</name>
@@ -21,6 +21,20 @@
                     <target>1.7</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

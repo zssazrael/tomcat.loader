@@ -8,11 +8,11 @@ import java.nio.charset.Charset;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.loader.WebappLoader;
+import org.apache.catalina.loader.VirtualWebappLoader;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
-public class MavenWebappLoader extends WebappLoader {
+public class MavenWebappLoader extends VirtualWebappLoader {
     private static final Log LOGGER = LogFactory.getLog(MavenWebappLoader.class);
 
     private String mvn;
@@ -30,14 +30,10 @@ public class MavenWebappLoader extends WebappLoader {
     }
 
     @Override
-    protected void stopInternal() throws LifecycleException {
-        super.stopInternal();
-    }
-
-    @Override
     protected void startInternal() throws LifecycleException {
         final File mvn = new File(this.mvn);
         if ((getContainer() instanceof Context) && mvn.isFile()) {
+            final StringBuilder builder = new StringBuilder();
             try {
                 final Context context = (Context) getContainer();
                 if (context.getDocBase() != null) {
@@ -51,20 +47,21 @@ public class MavenWebappLoader extends WebappLoader {
                             if (line.startsWith("[")) {
                                 continue;
                             }
-                            LOGGER.info(line);
                             for (String path : line.split(File.pathSeparator)) {
                                 if (path.length() > 0) {
-                                    addRepository(new File(path).toURI().toString());
+                                    builder.append(path).append(';');
                                 }
                             }
                         }
                     }
                     final File classFolder = new File(projectFolder, "target/classes");
-                    addRepository(classFolder.toURI().toString());
+                    builder.append(classFolder.getAbsolutePath()).append(';');
                 }
             } catch (IOException e) {
                 throw new LifecycleException(e);
             }
+            LOGGER.info(builder.toString());
+            setVirtualClasspath(builder.toString());
         }
         super.startInternal();
     }
