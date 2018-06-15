@@ -3,7 +3,7 @@
 
     <groupId>zss</groupId>
     <artifactId>tomcat.loader</artifactId>
-    <version>9.0-2018.06.14-SNAPSHOT</version>
+    <version>9.0-2018.06.14</version>
     <packaging>jar</packaging>
 
     <name>tomcat.loader</name>
